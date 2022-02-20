@@ -1,8 +1,9 @@
 
 import os
 import io
+import pandas as pd
 
-BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+# BASE_DIR = "/"
 X_COORD = 'x'
 Y_COORD = 'y'
 COORDINATES = 'coordinates'
@@ -24,49 +25,55 @@ def calculate_distance(cust_1, cust_2):
 
 
 def load_problem_instance(problem_name='R101'):
-    cust_num = 0
-    text_file = os.path.join(BASE_DIR, 'data', problem_name + '.txt')
+    
+    text_file = os.path.join('data_csv', problem_name + '.csv')
     parsed_data = {}
-    with io.open(text_file, 'rt', newline='') as fo:
-        for line_count, line in enumerate(fo, start=1):
-            if line_count == 1:
-                parsed_data[INSTANCE_NAME] = line.strip()
-            elif line_count == 5:
-                values = line.strip().split()
-                parsed_data[MAX_VEHICLE_NUMBER] = int(values[0])
-                parsed_data[VEHICLE_CAPACITY] = float(values[1])
-            elif line_count == 10:
-                # DEPART
-                values = line.strip().split()
-                parsed_data[DEPART] = {
-                    COORDINATES: {
-                        X_COORD: float(values[1]),
-                        Y_COORD: float(values[2]),
-                    },
-                    DEMAND: float(values[3]),
-                    READY_TIME: float(values[4]),
-                    DUE_TIME: float(values[5]),
-                    SERVICE_TIME: float(values[6]),
-                }
-            elif line_count > 10:
-                # CUSTOMERS
-                values = line.strip().split()
-                parsed_data[F'C_{values[0]}'] = {
-                    COORDINATES: {
-                        X_COORD: float(values[1]),
-                        Y_COORD: float(values[2]),
-                    },
-                    DEMAND: float(values[3]),
-                    READY_TIME: float(values[4]),
-                    DUE_TIME: float(values[5]),
-                    SERVICE_TIME: float(values[6]),
-                }
-                cust_num += 1
-            else:
-                pass
 
-        customers = [DEPART] + [F'C_{x}' for x in range(1, cust_num+1)]
-        parsed_data[DISTANCE_MATRIX] = \
-            [[calculate_distance(parsed_data[c1], parsed_data[c2]) for c1 in customers] for c2 in customers]
+    data_csv = pd.read_csv(text_file, sep=',')
 
-        return parsed_data
+    
+    parsed_data[INSTANCE_NAME] = data_csv[INSTANCE_NAME][0]
+    # print("________________ parsed_data[INSTANCE_NAME] ________________")
+    # print(parsed_data)
+
+    parsed_data[MAX_VEHICLE_NUMBER] = int(data_csv[MAX_VEHICLE_NUMBER][0])
+    parsed_data[VEHICLE_CAPACITY] = float(data_csv[VEHICLE_CAPACITY][0])
+# vị trí khởi hành
+    parsed_data[DEPART] = {
+                    COORDINATES: {
+                        X_COORD: float(data_csv[X_COORD][0]),
+                        Y_COORD: float(data_csv[Y_COORD][0]),
+                    },
+
+                    DEMAND: float(data_csv[DEMAND][0]),
+                    READY_TIME: float(data_csv[READY_TIME][0]),
+                    DUE_TIME: float(data_csv[DUE_TIME][0]),
+                    SERVICE_TIME: float(data_csv[SERVICE_TIME][0]),
+                }
+                
+    number_of_customers = len(data_csv) - 1
+    for i in range(1, number_of_customers + 1):
+        parsed_data[F'C_{i}'] = {
+                        COORDINATES: {
+                            X_COORD: float(data_csv[X_COORD][i]),
+                            Y_COORD: float(data_csv[Y_COORD][i]),
+                        },
+                        DEMAND: float(data_csv[DEMAND][i]),
+                        READY_TIME: float(data_csv[READY_TIME][i]),
+                        DUE_TIME: float(data_csv[DUE_TIME][i]),
+                        SERVICE_TIME: float(data_csv[SERVICE_TIME][i]),
+                    }
+            
+
+
+    customers = [DEPART] + [F'C_{x}' for x in range(1, number_of_customers+1)]
+    parsed_data[DISTANCE_MATRIX] = \
+        [[calculate_distance(parsed_data[c1], parsed_data[c2]) for c1 in customers] for c2 in customers]
+
+    return parsed_data
+
+
+if __name__ == '__main__':
+    data =  load_problem_instance()
+    print(data)
+    # print(data)

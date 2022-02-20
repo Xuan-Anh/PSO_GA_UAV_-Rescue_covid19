@@ -9,7 +9,7 @@ from process_data import *
 
 
 def create_route_from_ind(individual, data):
-
+    
     vehicle_capacity = data[VEHICLE_CAPACITY]
     depart_due_time = data[DEPART][DUE_TIME]
 
@@ -18,15 +18,18 @@ def create_route_from_ind(individual, data):
     vehicle_load = 0
     time_elapsed = 0
     previous_cust_id = 0
+    return_due = 999999
     for customer_id in individual:
         demand = data[F'C_{customer_id}'][DEMAND]
         updated_vehicle_load = vehicle_load + demand
         service_time = data[F'C_{customer_id}'][SERVICE_TIME]
-        return_time = data[DISTANCE_MATRIX][customer_id][0]
-        travel_time = data[DISTANCE_MATRIX][previous_cust_id][customer_id]
+        return_time = data[DISTANCE_MATRIX][customer_id][0]/(1-vehicle_load/vehicle_capacity)
+        travel_time = data[DISTANCE_MATRIX][previous_cust_id][customer_id]/(1-vehicle_load/vehicle_capacity)
         provisional_time = time_elapsed + travel_time + service_time + return_time
+        return_due = min(return_due, data[F'C_{customer_id}'][DUE_TIME])
         # Validate vehicle load and elapsed time
-        if (updated_vehicle_load <= vehicle_capacity) and (provisional_time <= depart_due_time):
+        
+        if (updated_vehicle_load <= vehicle_capacity) and (provisional_time <= return_due):
             # Add to current sub-route
             sub_route.append(customer_id)
             vehicle_load = updated_vehicle_load
@@ -37,7 +40,7 @@ def create_route_from_ind(individual, data):
             # Initialize a new sub-route and add to it
             sub_route = [customer_id]
             vehicle_load = demand
-            travel_time = data[DISTANCE_MATRIX][0][customer_id]
+            travel_time = data[DISTANCE_MATRIX][0][customer_id]/(1-vehicle_load/vehicle_capacity)
             time_elapsed = travel_time + service_time
         # Update last customer ID
         previous_cust_id = customer_id
@@ -243,6 +246,7 @@ def update_particle(part, best, phi1, phi2):
     part[:] = validate_particle(new_part)
 
     # part[:], part.speed[:] = validate_particle2(part)
+
 
 
 
