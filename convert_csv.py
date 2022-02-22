@@ -57,7 +57,7 @@ if __name__ == '__main__':
             data['expired_time'][i] = data['due_time'][i] + int(time_window * random.random())
 
         df = pd.DataFrame(data)
-        df.to_csv('data_csv/'+df['instance_name'][0]+'.csv')
+        df.to_csv('data_csv/'+df['instance_name'][0] + '.csv')
 
 
 

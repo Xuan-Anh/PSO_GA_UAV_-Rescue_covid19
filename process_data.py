@@ -18,6 +18,7 @@ SERVICE_TIME = 'service_time'
 DISTANCE_MATRIX = 'distance_matrix'
 
 
+
 def calculate_distance(cust_1, cust_2):
     x_diff = cust_1[COORDINATES][X_COORD] - cust_2[COORDINATES][X_COORD]
     y_diff = cust_1[COORDINATES][Y_COORD] - cust_2[COORDINATES][Y_COORD]

@@ -4,19 +4,16 @@ from alg_creator import *
 
 if __name__ == '__main__':
 
-
-    problem_name = "C101"
+    problem_name = "C105"
     alg_name = "GA"
 
     customers_count = 25
-    max_generations = 1500
-    
+    max_generations = 150
+
     particles_pop_size = 80
     cognitive_acceleration = 2
     social_acceleration = 2
     speed_limit = 1.
-    
-
 
     population_size = 150
     crossover_prob = 0.9
@@ -41,9 +38,9 @@ if __name__ == '__main__':
         print(f'Social acceleration: {social_acceleration}')
         print(f'Cognitive acceleration: {cognitive_acceleration}')
         print(f'Speed limit: {speed_limit}')
-        res = run_pso(instance_name=problem_name, particle_size=customers_count, pop_size=particles_pop_size,
+        res = run_pso(instance_name=problem_name, particle_size=particles_pop_size, pop_size=particles_pop_size,
                       max_iteration=max_generations, cognitive_coef=cognitive_acceleration,
-                      social_coef=social_acceleration, s_limit=speed_limit, plot= True)
+                      social_coef=social_acceleration, s_limit=speed_limit, plot=True)
 
     elif alg_name == "GA":
         print(f'Population size: {population_size}')
@@ -55,5 +52,3 @@ if __name__ == '__main__':
     else:
         print("invalid algorithm")
         sys.exit()
-
-

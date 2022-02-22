@@ -1,5 +1,6 @@
 
 from core_funs import *
+import core_funs
 from deap import base, creator, tools
 import matplotlib.pyplot as plt
 import numpy
@@ -54,6 +55,7 @@ def plot_route(route, instance_name):
     plt.ylabel("y coordinate")
     plt.xlabel("x coordinate")
     plt.show()
+
     return
 
 
@@ -86,6 +88,7 @@ def run_pso(instance_name, particle_size, pop_size, max_iteration,
         plot_instance(instance_name=instance_name, customer_number=particle_size)
 
     creator.create("FitnessMax", base.Fitness, weights=(1.0,))
+    
     creator.create("Particle", list, fitness=creator.FitnessMax, speed=list,
                    smin=None, smax=None, best=None)
 
@@ -95,8 +98,7 @@ def run_pso(instance_name, particle_size, pop_size, max_iteration,
     toolbox.register("population", tools.initRepeat, list, toolbox.particle)
     toolbox.register("update", update_particle, phi1=cognitive_coef, phi2=social_coef)
     toolbox.register('evaluate', calculate_fitness, data=instance)
-
-    pop = toolbox.population(n=pop_size)
+    pop = toolbox.population(n = pop_size)
     stats = tools.Statistics(lambda ind: ind.fitness.values)
     stats.register("avg", numpy.mean)
     stats.register("std", numpy.std)
@@ -104,7 +106,7 @@ def run_pso(instance_name, particle_size, pop_size, max_iteration,
     stats.register("max", numpy.max)
 
     logbook = tools.Logbook()
-    logbook.header = ["gen", "evals"] + stats.fields
+    logbook.header = ["gen", "evals"] + stats.fields # gen: genaration, evals: kich thuoc quan the, avg, std, min, max
 
     best = None
     iter_num = 0
@@ -182,22 +184,29 @@ def run_ga(instance_name, individual_size, pop_size, cx_pb, mut_pb, n_gen, plot=
         return
 
     if plot:
-        plot_instance(instance_name=instance_name, customer_number=individual_size)
+        plot_instance(instance_name = instance_name, customer_number = individual_size)
 
-    creator.create('FitnessMax', base.Fitness, weights=(1.0,))
+    creator.create('FitnessMax', base.Fitness, weights=(1.0, ))
     creator.create('Individual', list, fitness=creator.FitnessMax)
     toolbox = base.Toolbox()
+    
     # Attribute generator
     toolbox.register('indexes', random.sample, range(1, individual_size + 1), individual_size)
+    print("AAAAAAAAAAAAAAAAA")
+    print(toolbox.indexes)
+
     # Structure initializers
-    toolbox.register('individual', tools.initIterate, creator.Individual, toolbox.indexes)
+    toolbox.register('individual', tools.initIterate, creator.Individual, toolbox.indexes) 
     toolbox.register('population', tools.initRepeat, list, toolbox.individual)
 
     toolbox.register('evaluate', calculate_fitness, data=instance)
     toolbox.register('select', tools.selRoulette)
-    toolbox.register('mate', crossover_pmx)
-    toolbox.register('mutate', mutate_swap)
+    toolbox.register('mate', crossover_pmx) # mate : phối sinh
+    toolbox.register('mutate', mutate_swap) # mutate: đột biến
+    
+    
     pop = toolbox.population(n=pop_size)
+
 
     stats = tools.Statistics(lambda ind: ind.fitness.values)
     stats.register("avg", numpy.mean)
@@ -220,13 +229,19 @@ def run_ga(instance_name, individual_size, pop_size, cx_pb, mut_pb, n_gen, plot=
 
     # Begin the evolution
     for gen in range(n_gen):
-        # Keep the best individual
+        
+        # giu lai ca the tot nhat  
         elite_ind = tools.selBest(pop, 1)
 
         # Choose 10% of best offspring, roulette select the rest 90% of rest
-        offspring = tools.selBest(pop, int(numpy.ceil(pop_size * 0.1)))
+        offspring = tools.selBest(pop, int(numpy.ceil(pop_size * 0.1))) # làm tròn lên 
         offspring = list(map(toolbox.clone, offspring))
-        offspring_roulette = toolbox.select(pop, int(numpy.floor(pop_size * 0.9)) - 1)
+        
+        # a = np.array([-1.7, -1.5, -0.2, 0.2, 1.5, 1.7, 2.0])
+        # np.floor(a)
+        # >>> array([-2., -2., -1.,  0.,  1.,  1.,  2.])
+
+        offspring_roulette = toolbox.select(pop, int(numpy.floor(pop_size * 0.9)) - 1) # làm tròn xuống, để tổng pop không đổi 
         offspring.extend(offspring_roulette)
 
         # Clone the selected individuals
@@ -255,8 +270,11 @@ def run_ga(instance_name, individual_size, pop_size, cx_pb, mut_pb, n_gen, plot=
                 previous_best = ind.fitness.values[0]
                 iter_num = gen + 1
 
-        logbook.record(gen=gen+1, evals=len(offspring), **stats.compile(offspring))
+
+        logbook.record(gen=gen+1, evals = len(offspring), **stats.compile(offspring))
         print(logbook.stream)
+
+
 
     end = time.time()
     print('### EVOLUTION END ###')
@@ -264,10 +282,14 @@ def run_ga(instance_name, individual_size, pop_size, cx_pb, mut_pb, n_gen, plot=
     print(f'Best individual: {best_ind}')
     route = create_route_from_ind(best_ind, instance)
     print_route(route)
+
+
     print(f'Fitness: { round(best_ind.fitness.values[0],2) }')
     print(f'Total cost: { round(calculate_fitness(best_ind, instance)[1],2) }')
     print(f'Found in (iteration): { iter_num }')
     print(f'Execution time (s): { round(end - start,2) }')
+
+
     # print(f'{ round(best_ind.fitness.values[0],2) } & { round(calculate_fitness(best_ind, instance)[1],2) } & { iter_num } & { round(end - start,2) }')
 
     if plot:

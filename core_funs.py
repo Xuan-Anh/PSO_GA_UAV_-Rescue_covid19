@@ -8,8 +8,10 @@ from deap import base, creator, tools
 from process_data import *
 
 
+
+
 def create_route_from_ind(individual, data):
-    
+
     vehicle_capacity = data[VEHICLE_CAPACITY]
     depart_due_time = data[DEPART][DUE_TIME]
 
@@ -23,12 +25,15 @@ def create_route_from_ind(individual, data):
         demand = data[F'C_{customer_id}'][DEMAND]
         updated_vehicle_load = vehicle_load + demand
         service_time = data[F'C_{customer_id}'][SERVICE_TIME]
-        return_time = data[DISTANCE_MATRIX][customer_id][0]/(1-vehicle_load/vehicle_capacity)
-        travel_time = data[DISTANCE_MATRIX][previous_cust_id][customer_id]/(1-vehicle_load/vehicle_capacity)
+        return_time = data[DISTANCE_MATRIX][customer_id][0] / \
+            (1-vehicle_load/vehicle_capacity)
+        travel_time = data[DISTANCE_MATRIX][previous_cust_id][customer_id] / \
+            (1-vehicle_load/vehicle_capacity)
         provisional_time = time_elapsed + travel_time + service_time + return_time
         return_due = min(return_due, data[F'C_{customer_id}'][DUE_TIME])
-        # Validate vehicle load and elapsed time
         
+        # Validate vehicle load and elapsed time
+
         if (updated_vehicle_load <= vehicle_capacity) and (provisional_time <= return_due):
             # Add to current sub-route
             sub_route.append(customer_id)
@@ -40,7 +45,8 @@ def create_route_from_ind(individual, data):
             # Initialize a new sub-route and add to it
             sub_route = [customer_id]
             vehicle_load = demand
-            travel_time = data[DISTANCE_MATRIX][0][customer_id]/(1-vehicle_load/vehicle_capacity)
+            travel_time = data[DISTANCE_MATRIX][0][customer_id] / \
+                (1-vehicle_load/vehicle_capacity)
             time_elapsed = travel_time + service_time
         # Update last customer ID
         previous_cust_id = customer_id
@@ -70,6 +76,8 @@ def calculate_fitness(individual, data):
             sub_route_distance = 0
             elapsed_time = 0
             previous_cust_id = 0
+            
+            
             for cust_id in sub_route:
                 # Calculate section distance
                 distance = data[DISTANCE_MATRIX][previous_cust_id][cust_id]
@@ -79,8 +87,10 @@ def calculate_fitness(individual, data):
                 # Calculate time cost
                 arrival_time = elapsed_time + distance
 
-                waiting_time = max(data[F'C_{cust_id}'][READY_TIME] - arrival_time, 0)
-                delay_time = max(arrival_time - data[F'C_{cust_id}'][DUE_TIME], 0)
+                waiting_time = max(
+                    data[F'C_{cust_id}'][READY_TIME] - arrival_time, 0)
+                delay_time = max(
+                    arrival_time - data[F'C_{cust_id}'][DUE_TIME], 0)
                 time_cost = wait_penalty * waiting_time + delay_penalty * delay_time
 
                 # Update sub-route time cost
@@ -96,9 +106,12 @@ def calculate_fitness(individual, data):
             # Calculate transport cost
             distance_depot = data[DISTANCE_MATRIX][previous_cust_id][0]
             sub_route_distance += distance_depot
-            sub_route_transport_cost = vehicle_setup_cost + transport_cost * sub_route_distance
+            sub_route_transport_cost = vehicle_setup_cost + \
+                transport_cost * sub_route_distance
+           
             # Obtain sub-route cost
             sub_route_cost = sub_route_time_cost + sub_route_transport_cost
+           
             # Update total cost`
             total_cost += sub_route_cost
 
@@ -132,8 +145,10 @@ def crossover_pmx(ind1, ind2):
         ind1[i], ind1[pos_ind1[temp2-1]] = temp2, temp1
         ind2[i], ind2[pos_ind2[temp1-1]] = temp1, temp2
         # save updated positions
-        pos_ind1[temp1-1], pos_ind1[temp2-1] = pos_ind1[temp2-1], pos_ind1[temp1-1]
-        pos_ind2[temp1-1], pos_ind2[temp2-1] = pos_ind2[temp2-1], pos_ind2[temp1-1]
+        pos_ind1[temp1-1], pos_ind1[temp2 -
+                                    1] = pos_ind1[temp2-1], pos_ind1[temp1-1]
+        pos_ind2[temp1-1], pos_ind2[temp2 -
+                                    1] = pos_ind2[temp2-1], pos_ind2[temp1-1]
 
     return ind1, ind2
 
@@ -174,7 +189,8 @@ def create_particle(vals, s_min, s_max):
 
 
 def remove_duplicates(vals):
-    duplic = [item for item, count in collections.Counter(vals).items() if count > 1]
+    duplic = [item for item, count in collections.Counter(
+        vals).items() if count > 1]
     uniq_part = []
     offset = 0.001
     count = [1] * len(duplic)
@@ -205,7 +221,8 @@ def validate_particle(particle):
 
 
 def validate_particle2(particle):
-    swap_list = remove_duplicates(list(map(operator.add, list(range(1, len(particle)+1)), particle.speed)))
+    swap_list = remove_duplicates(
+        list(map(operator.add, list(range(1, len(particle)+1)), particle.speed)))
     validated_part = []
     validated_speed = []
     sorted_asc = sorted(swap_list, key=float)
@@ -218,6 +235,7 @@ def validate_particle2(particle):
         validated_speed.append(particle.speed[index])
 
     return validated_part, validated_speed
+
 
 # The function updateParticle() first computes the speed,
 # then limits the speed values between smin and smax,
@@ -233,7 +251,8 @@ def update_particle(part, best, phi1, phi2):
     # the neighbourhood best
     v_u2 = map(operator.mul, u2, map(operator.sub, best, part))
     # update particle speed
-    part.speed = list(map(operator.add, part.speed, map(operator.add, v_u1, v_u2)))
+    part.speed = list(map(operator.add, part.speed,
+                      map(operator.add, v_u1, v_u2)))
     # speed limits
     for i, speed in enumerate(part.speed):
         if abs(speed) < part.smin:
@@ -246,8 +265,3 @@ def update_particle(part, best, phi1, phi2):
     part[:] = validate_particle(new_part)
 
     # part[:], part.speed[:] = validate_particle2(part)
-
-
-
-
-
