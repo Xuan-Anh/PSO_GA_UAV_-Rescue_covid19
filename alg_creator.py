@@ -30,8 +30,27 @@ def plot_route(route, instance_name):
     instance = load_problem_instance(instance_name)
     color_pack = ['bo', 'go', 'ro', 'co', 'mo', 'yo', 'ko',
                   'b*', 'g*', 'r*', 'c*', 'm*', 'y*', 'k*',
+                  'bp', 'gp', 'rp', 'cp', 'mp', 'yp', 'kp',
+                  'bo', 'go', 'ro', 'co', 'mo', 'yo', 'ko',
+                  'b*', 'g*', 'r*', 'c*', 'm*', 'y*', 'k*',
+                  'bp', 'gp', 'rp', 'cp', 'mp', 'yp', 'kp','bo', 'go', 'ro', 'co', 'mo', 'yo', 'ko',
+                  'b*', 'g*', 'r*', 'c*', 'm*', 'y*', 'k*',
+                  'bp', 'gp', 'rp', 'cp', 'mp', 'yp', 'kp',
+                  'bo', 'go', 'ro', 'co', 'mo', 'yo', 'ko',
+                  'b*', 'g*', 'r*', 'c*', 'm*', 'y*', 'k*',
+                  'bp', 'gp', 'rp', 'cp', 'mp', 'yp', 'kp','bo', 'go', 'ro', 'co', 'mo', 'yo', 'ko',
+                  'b*', 'g*', 'r*', 'c*', 'm*', 'y*', 'k*',
                   'bp', 'gp', 'rp', 'cp', 'mp', 'yp', 'kp']
     line_color_pack = ['b', 'g', 'r', 'c', 'm', 'y', 'k',
+                       'b', 'g', 'r', 'c', 'm', 'y', 'k',
+                       'b', 'g', 'r', 'c', 'm', 'y', 'k',
+                       'b', 'g', 'r', 'c', 'm', 'y', 'k',
+                       'b', 'g', 'r', 'c', 'm', 'y', 'k',
+                       'b', 'g', 'r', 'c', 'm', 'y', 'k',
+                       'b', 'g', 'r', 'c', 'm', 'y', 'k',
+                       'b', 'g', 'r', 'c', 'm', 'y', 'k',
+                       'b', 'g', 'r', 'c', 'm', 'y', 'k',
+                       'b', 'g', 'r', 'c', 'm', 'y', 'k',
                        'b', 'g', 'r', 'c', 'm', 'y', 'k',
                        'b', 'g', 'r', 'c', 'm', 'y', 'k']
     c_ind = -1
@@ -133,7 +152,7 @@ def run_pso(instance_name, particle_size, pop_size, max_iteration,
             some_inds = tools.selRandom(rand_pop, int(numpy.ceil(pop_size * 0.1)))  # random pop here
             mod_pop = tools.selWorst(pop, int(numpy.ceil(pop_size * 0.9)))
         else:
-            some_inds = tools.selBest(pop, int(numpy.ceil(pop_size * 0.05)))  # elite pop here
+            some_inds = tools.selBest(pop, int(numpy.ceil(pop_size * 0.05)))        # elite pop here
             mod_pop = tools.selRandom(pop, int(numpy.ceil(pop_size * 0.95)))
 
         mod_pop = list(map(toolbox.clone, mod_pop))
@@ -174,6 +193,8 @@ def run_pso(instance_name, particle_size, pop_size, max_iteration,
     return route
 
 
+
+
 # runs ga and prints the solution
 # https://deap.readthedocs.io/en/master/examples/ga_onemax.html
 def run_ga(instance_name, individual_size, pop_size, cx_pb, mut_pb, n_gen, plot=False, save=False, logs=False):
@@ -187,19 +208,20 @@ def run_ga(instance_name, individual_size, pop_size, cx_pb, mut_pb, n_gen, plot=
         plot_instance(instance_name = instance_name, customer_number = individual_size)
 
     creator.create('FitnessMax', base.Fitness, weights=(1.0, ))
-    creator.create('Individual', list, fitness=creator.FitnessMax)
+    creator.create('Individual', list, fitness = creator.FitnessMax)
     toolbox = base.Toolbox()
     
     # Attribute generator
     toolbox.register('indexes', random.sample, range(1, individual_size + 1), individual_size)
-    print("AAAAAAAAAAAAAAAAA")
-    print(toolbox.indexes)
+
+
 
     # Structure initializers
     toolbox.register('individual', tools.initIterate, creator.Individual, toolbox.indexes) 
     toolbox.register('population', tools.initRepeat, list, toolbox.individual)
 
-    toolbox.register('evaluate', calculate_fitness, data=instance)
+
+    toolbox.register('evaluate', calculate_fitness, data = instance)
     toolbox.register('select', tools.selRoulette)
     toolbox.register('mate', crossover_pmx) # mate : phối sinh
     toolbox.register('mutate', mutate_swap) # mutate: đột biến
@@ -214,8 +236,10 @@ def run_ga(instance_name, individual_size, pop_size, cx_pb, mut_pb, n_gen, plot=
     stats.register("min", numpy.min)
     stats.register("max", numpy.max)
 
+
     logbook = tools.Logbook()
     logbook.header = ["gen", "evals"] + stats.fields
+
 
     iter_num = 0
     previous_best = 0
@@ -245,10 +269,15 @@ def run_ga(instance_name, individual_size, pop_size, cx_pb, mut_pb, n_gen, plot=
         offspring.extend(offspring_roulette)
 
         # Clone the selected individuals
+
         offspring = list(toolbox.map(toolbox.clone, offspring))
 
         # Apply crossover and mutation
-        for child1, child2 in zip(offspring[::2], offspring[1::2]):
+        """
+        offspring[::2]: duyệt hết mảng với khoảng cách 2
+        offspring[1::2]: duyệt từ phần tử thứ 1 đến hết mảng với khoảng cách 2
+        """
+        for child1, child2 in zip(offspring[::2], offspring[1::2]): 
             if random.random() < cx_pb:
                 toolbox.mate(child1, child2)
                 del child1.fitness.values

@@ -6,7 +6,6 @@ import os
 if __name__ == '__main__':
     for file in os.listdir('data/'):
         file = file.strip('.txt')
-        print(file)
         instance = load_problem_instance(file)
         data = {'instance_name': [instance['instance_name']], 'max_vehicle_number': [instance['max_vehicle_number']],
             'vehicle_capacity': [instance['vehicle_capacity']],'cust_no':[], 'x':[], 'y':[],

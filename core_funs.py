@@ -25,10 +25,10 @@ def create_route_from_ind(individual, data):
         demand = data[F'C_{customer_id}'][DEMAND]
         updated_vehicle_load = vehicle_load + demand
         service_time = data[F'C_{customer_id}'][SERVICE_TIME]
-        return_time = data[DISTANCE_MATRIX][customer_id][0] / \
-            (1-vehicle_load/vehicle_capacity)
-        travel_time = data[DISTANCE_MATRIX][previous_cust_id][customer_id] / \
-            (1-vehicle_load/vehicle_capacity)
+        return_time = data[DISTANCE_MATRIX][customer_id][0] *((math.e)**(vehicle_load/30))*1/4
+        #    ((1 - vehicle_load/vehicle_capacity)*0.7 + 0.2)
+        travel_time = data[DISTANCE_MATRIX][previous_cust_id][customer_id] *((math.e)**(vehicle_load/30))*1/4
+        #    ((1 - vehicle_load/vehicle_capacity)*0.7 + 0.2)
         provisional_time = time_elapsed + travel_time + service_time + return_time
         return_due = min(return_due, data[F'C_{customer_id}'][DUE_TIME])
         
@@ -45,8 +45,9 @@ def create_route_from_ind(individual, data):
             # Initialize a new sub-route and add to it
             sub_route = [customer_id]
             vehicle_load = demand
-            travel_time = data[DISTANCE_MATRIX][0][customer_id] / \
-                (1-vehicle_load/vehicle_capacity)
+            travel_time = data[DISTANCE_MATRIX][0][customer_id] *((math.e)**(vehicle_load/30))*1/4
+            
+            # time_elapsed = travel_time
             time_elapsed = travel_time + service_time
         # Update last customer ID
         previous_cust_id = customer_id
@@ -79,13 +80,21 @@ def calculate_fitness(individual, data):
             
             
             for cust_id in sub_route:
+                # # Calculate section distance
+                # distance = data[DISTANCE_MATRIX][previous_cust_id][cust_id]
+                # # Update sub-route distance
+                # sub_route_distance = sub_route_distance + distance
+
+                # # Calculate time cost
+                # arrival_time = elapsed_time + distance
+
                 # Calculate section distance
-                distance = data[DISTANCE_MATRIX][previous_cust_id][cust_id]
+                distance_time = data[DISTANCE_MATRIX][previous_cust_id][cust_id]
                 # Update sub-route distance
-                sub_route_distance = sub_route_distance + distance
+                sub_route_distance = sub_route_distance + distance_time
 
                 # Calculate time cost
-                arrival_time = elapsed_time + distance
+                arrival_time = elapsed_time + distance_time
 
                 waiting_time = max(
                     data[F'C_{cust_id}'][READY_TIME] - arrival_time, 0)
@@ -123,7 +132,7 @@ def calculate_fitness(individual, data):
 
 # Double point crossover
 def crossover_pmx(ind1, ind2):
-
+    
     ind_len = len(ind1)
     pos_ind1 = [0]*ind_len
     pos_ind2 = [0]*ind_len
@@ -244,9 +253,13 @@ def validate_particle2(particle):
 
 def update_particle(part, best, phi1, phi2):
 
+    # The probability density function of the uniform distribution : phân phối đều 
+    # tạo u1 u2 một cách ngẫu nhiên theo phân bố đều 
     u1 = (random.uniform(0, phi1) for _ in range(len(part)))
     u2 = (random.uniform(0, phi2) for _ in range(len(part)))
     # the particle's best position
+    # print("particle best", part.best)
+
     v_u1 = map(operator.mul, u1, map(operator.sub, part.best, part))
     # the neighbourhood best
     v_u2 = map(operator.mul, u2, map(operator.sub, best, part))
@@ -263,5 +276,10 @@ def update_particle(part, best, phi1, phi2):
 
     new_part = list(map(operator.add, part, part.speed))
     part[:] = validate_particle(new_part)
-
+    # print("XA_particle: ", part)
+    
     # part[:], part.speed[:] = validate_particle2(part)
+
+if __name__ == "__main__":
+    data = load_problem_instance(problem_name='C101')
+    print("data[DISTANCE_MATRIX][0] = ",data[DISTANCE_MATRIX][0])

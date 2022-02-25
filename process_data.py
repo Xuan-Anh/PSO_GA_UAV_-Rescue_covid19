@@ -76,5 +76,5 @@ def load_problem_instance(problem_name='R101'):
 
 if __name__ == '__main__':
     data =  load_problem_instance()
-    print(data)
+    print(data[DISTANCE_MATRIX])
     # print(data)
