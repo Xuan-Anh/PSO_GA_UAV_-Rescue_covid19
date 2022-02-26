@@ -4,8 +4,8 @@ from alg_creator import *
 
 if __name__ == '__main__':
 
-    problem_name = "C101"
-    alg_name = "PSO"
+    problem_name = "RC101"
+    alg_name = "GA"
 
     customers_count = 30
 
@@ -16,8 +16,7 @@ if __name__ == '__main__':
     social_acceleration = 2
     speed_limit = 1.
 
-    population_size = 300
-
+    population_size = 200
     crossover_prob = 0.9
     mutation_prob = 0.09
 
@@ -40,7 +39,7 @@ if __name__ == '__main__':
         print(f'Social acceleration: {social_acceleration}')
         print(f'Cognitive acceleration: {cognitive_acceleration}')
         print(f'Speed limit: {speed_limit}')
-        res = run_pso(instance_name=problem_name, particle_size=particles_pop_size, pop_size=particles_pop_size,
+        res = run_pso(instance_name=problem_name, particle_size=particles_pop_size, pop_size=population_size,
                       max_iteration=max_generations, cognitive_coef=cognitive_acceleration,
                       social_coef=social_acceleration, s_limit=speed_limit, plot=True)
 

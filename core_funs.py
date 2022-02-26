@@ -13,7 +13,6 @@ from process_data import *
 def create_route_from_ind(individual, data):
 
     vehicle_capacity = data[VEHICLE_CAPACITY]
-    depart_due_time = data[DEPART][DUE_TIME]
 
     route = []
     sub_route = []
@@ -59,10 +58,10 @@ def create_route_from_ind(individual, data):
 
 def calculate_fitness(individual, data):
 
-    transport_cost = 8.0  # cost of moving 1 vehicle for 1 unit
-    vehicle_setup_cost = 50.0  # cost of adapting new vehicle
-    wait_penalty = 0.5  # penalty for arriving too early
-    delay_penalty = 3.0  # penalty for arriving too late
+    transport_cost = 8.0  # chi phí gửi drone đến unit đầu tiên
+    vehicle_setup_cost = 50.0  # chi phí thêm 1 drone
+    wait_penalty = 0.5  # phạt đến quá sớm
+    delay_penalty = 3.0  # phạt đến quá chậm
 
     route = create_route_from_ind(individual, data)
     total_cost = 999999
@@ -78,7 +77,12 @@ def calculate_fitness(individual, data):
             elapsed_time = 0
             previous_cust_id = 0
             
+            sum_demand = 0
+
+            for cust_id in sub_route:
+                sum_demand += data[F'C_{cust_id}'][DEMAND]
             
+
             for cust_id in sub_route:
                 # # Calculate section distance
                 # distance = data[DISTANCE_MATRIX][previous_cust_id][cust_id]
@@ -89,7 +93,9 @@ def calculate_fitness(individual, data):
                 # arrival_time = elapsed_time + distance
 
                 # Calculate section distance
-                distance_time = data[DISTANCE_MATRIX][previous_cust_id][cust_id]
+                distance = data[DISTANCE_MATRIX][previous_cust_id][cust_id]
+                distance_time = distance *((math.e)**(sum_demand/30))*1/4
+                
                 # Update sub-route distance
                 sub_route_distance = sub_route_distance + distance_time
 
@@ -111,6 +117,9 @@ def calculate_fitness(individual, data):
 
                 # Update last customer ID
                 previous_cust_id = cust_id
+
+                #update sum_demand
+                sum_demand -= data[F'C_{cust_id}'][DEMAND]
 
             # Calculate transport cost
             distance_depot = data[DISTANCE_MATRIX][previous_cust_id][0]
