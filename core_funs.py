@@ -7,7 +7,19 @@ import collections
 from deap import base, creator, tools
 from process_data import *
 
-
+import numpy as np
+def get_travel_time(w):
+    g = 9.8
+    Wd = 50
+    P = 2600
+    v0 = 200
+    # print(g*(Wd + w)/P)
+    ts = np.sin(np.arccos(g*(Wd + w)/P))
+    # print(ts)
+    ms = np.sin(np.arccos(g*w/P))
+    # print(ms)
+    travel_time  = ms/ts*v0 - 200
+    return travel_time
 
 
 def create_route_from_ind(individual, data):
@@ -24,9 +36,9 @@ def create_route_from_ind(individual, data):
         demand = data[F'C_{customer_id}'][DEMAND]
         updated_vehicle_load = vehicle_load + demand
         service_time = data[F'C_{customer_id}'][SERVICE_TIME]
-        return_time = data[DISTANCE_MATRIX][customer_id][0] *((math.e)**(vehicle_load/30))*1/4
+        return_time = data[DISTANCE_MATRIX][customer_id][0] * get_travel_time(updated_vehicle_load)
         #    ((1 - vehicle_load/vehicle_capacity)*0.7 + 0.2)
-        travel_time = data[DISTANCE_MATRIX][previous_cust_id][customer_id] *((math.e)**(vehicle_load/30))*1/4
+        travel_time = data[DISTANCE_MATRIX][previous_cust_id][customer_id] * get_travel_time(updated_vehicle_load)
         #    ((1 - vehicle_load/vehicle_capacity)*0.7 + 0.2)
         provisional_time = time_elapsed + travel_time + service_time + return_time
         return_due = min(return_due, data[F'C_{customer_id}'][DUE_TIME])
@@ -44,7 +56,7 @@ def create_route_from_ind(individual, data):
             # Initialize a new sub-route and add to it
             sub_route = [customer_id]
             vehicle_load = demand
-            travel_time = data[DISTANCE_MATRIX][0][customer_id] *((math.e)**(vehicle_load/30))*1/4
+            travel_time = data[DISTANCE_MATRIX][0][customer_id] * get_travel_time(updated_vehicle_load)
             
             # time_elapsed = travel_time
             time_elapsed = travel_time + service_time
@@ -94,7 +106,7 @@ def calculate_fitness(individual, data):
 
                 # Calculate section distance
                 distance = data[DISTANCE_MATRIX][previous_cust_id][cust_id]
-                distance_time = distance *((math.e)**(sum_demand/30))*1/4
+                distance_time = distance * get_travel_time(sum_demand)
                 
                 # Update sub-route distance
                 sub_route_distance = sub_route_distance + distance_time
@@ -284,6 +296,7 @@ def update_particle(part, best, phi1, phi2):
             part.speed[i] = math.copysign(part.smax, speed)
 
     new_part = list(map(operator.add, part, part.speed))
+    print("new_part = ", new_part)
     part[:] = validate_particle(new_part)
     # print("XA_particle: ", part)
     
