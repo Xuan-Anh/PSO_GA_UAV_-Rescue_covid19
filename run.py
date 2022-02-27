@@ -4,19 +4,19 @@ from alg_creator import *
 
 if __name__ == '__main__':
 
-    problem_name = "C101"
+    problem_name = "RC101"
     alg_name = "GA"
 
     customers_count = 30          
 
-    max_generations = 3
+    max_generations = 1000
 
-    particles_pop_size = 30 # particles_pop_size = customers_size
+    particles_pop_size = customers_count # particles_pop_size = customers_size
     cognitive_acceleration = 2
     social_acceleration = 2
     speed_limit = 1.
 
-    population_size = 30
+    population_size = 200
     crossover_prob = 0.9
     mutation_prob = 0.09
 

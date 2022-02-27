@@ -33,12 +33,14 @@ def plot_route(route, instance_name):
                   'bp', 'gp', 'rp', 'cp', 'mp', 'yp', 'kp',
                   'bo', 'go', 'ro', 'co', 'mo', 'yo', 'ko',
                   'b*', 'g*', 'r*', 'c*', 'm*', 'y*', 'k*',
-                  'bp', 'gp', 'rp', 'cp', 'mp', 'yp', 'kp','bo', 'go', 'ro', 'co', 'mo', 'yo', 'ko',
+                  'bp', 'gp', 'rp', 'cp', 'mp', 'yp', 'kp',
+                  'bo', 'go', 'ro', 'co', 'mo', 'yo', 'ko',
                   'b*', 'g*', 'r*', 'c*', 'm*', 'y*', 'k*',
                   'bp', 'gp', 'rp', 'cp', 'mp', 'yp', 'kp',
                   'bo', 'go', 'ro', 'co', 'mo', 'yo', 'ko',
                   'b*', 'g*', 'r*', 'c*', 'm*', 'y*', 'k*',
-                  'bp', 'gp', 'rp', 'cp', 'mp', 'yp', 'kp','bo', 'go', 'ro', 'co', 'mo', 'yo', 'ko',
+                  'bp', 'gp', 'rp', 'cp', 'mp', 'yp', 'kp',
+                  'bo', 'go', 'ro', 'co', 'mo', 'yo', 'ko',
                   'b*', 'g*', 'r*', 'c*', 'm*', 'y*', 'k*',
                   'bp', 'gp', 'rp', 'cp', 'mp', 'yp', 'kp']
     line_color_pack = ['b', 'g', 'r', 'c', 'm', 'y', 'k',
@@ -249,7 +251,7 @@ def run_ga(instance_name, individual_size, pop_size, cx_pb, mut_pb, n_gen, plot=
     # Begin the evolution
     for gen in range(n_gen):
         
-        # giu lai ca the tot nhat  
+        # Keep the best individual
         elite_ind = tools.selBest(pop, 1)
 
         # Choose 10% of best offspring, roulette select the rest 90% of rest

@@ -39,7 +39,7 @@ def load_problem_instance(problem_name='R101'):
 
     parsed_data[MAX_VEHICLE_NUMBER] = int(data_csv[MAX_VEHICLE_NUMBER][0])
     parsed_data[VEHICLE_CAPACITY] = float(data_csv[VEHICLE_CAPACITY][0])
-# vị trí khởi hành
+    # vị trí khởi hành
     parsed_data[DEPART] = {
                     COORDINATES: {
                         X_COORD: float(data_csv[X_COORD][0]),

@@ -8,18 +8,19 @@ from deap import base, creator, tools
 from process_data import *
 
 import numpy as np
+
 def get_travel_time(w):
     g = 9.8
-    Wd = 50
-    P = 2600
+    Wd = 60
     v0 = 200
-    # print(g*(Wd + w)/P)
+    P = 2200
     ts = np.sin(np.arccos(g*(Wd + w)/P))
     # print(ts)
     ms = np.sin(np.arccos(g*w/P))
     # print(ms)
-    travel_time  = ms/ts*v0 - 200
+    travel_time  = ms/ts*v0 - v0 
     return travel_time
+
 
 
 def create_route_from_ind(individual, data):
@@ -36,9 +37,9 @@ def create_route_from_ind(individual, data):
         demand = data[F'C_{customer_id}'][DEMAND]
         updated_vehicle_load = vehicle_load + demand
         service_time = data[F'C_{customer_id}'][SERVICE_TIME]
-        return_time = data[DISTANCE_MATRIX][customer_id][0] * ((math.e)**(updated_vehicle_load/30))*1/4
+        return_time = data[DISTANCE_MATRIX][customer_id][0] * get_travel_time(updated_vehicle_load)
         #    ((1 - vehicle_load/vehicle_capacity)*0.7 + 0.2)
-        travel_time = data[DISTANCE_MATRIX][previous_cust_id][customer_id] * ((math.e)**(updated_vehicle_load/30))*1/4
+        travel_time = data[DISTANCE_MATRIX][previous_cust_id][customer_id] * get_travel_time(updated_vehicle_load)
         #    ((1 - vehicle_load/vehicle_capacity)*0.7 + 0.2)
         provisional_time = time_elapsed + travel_time + service_time + return_time
         return_due = min(return_due, data[F'C_{customer_id}'][DUE_TIME])
@@ -56,7 +57,7 @@ def create_route_from_ind(individual, data):
             # Initialize a new sub-route and add to it
             sub_route = [customer_id]
             vehicle_load = demand
-            travel_time = data[DISTANCE_MATRIX][0][customer_id] *  ((math.e)**(updated_vehicle_load/30))*1/4
+            travel_time = data[DISTANCE_MATRIX][0][customer_id] *  get_travel_time(vehicle_load)
             
             # time_elapsed = travel_time
             time_elapsed = travel_time + service_time
@@ -96,17 +97,9 @@ def calculate_fitness(individual, data):
             
 
             for cust_id in sub_route:
-                # # Calculate section distance
-                # distance = data[DISTANCE_MATRIX][previous_cust_id][cust_id]
-                # # Update sub-route distance
-                # sub_route_distance = sub_route_distance + distance
-
-                # # Calculate time cost
-                # arrival_time = elapsed_time + distance
-
-                # Calculate section distance
+        
                 distance = data[DISTANCE_MATRIX][previous_cust_id][cust_id]
-                distance_time = distance *  ((math.e)**(sum_demand/30))*1/4
+                distance_time = distance *  get_travel_time(sum_demand)
                 
                 # Update sub-route distance
                 sub_route_distance = sub_route_distance + distance_time
@@ -179,9 +172,6 @@ def crossover_pmx(ind1, ind2):
                                     1] = pos_ind1[temp2-1], pos_ind1[temp1-1]
         pos_ind2[temp1-1], pos_ind2[temp2 -
                                     1] = pos_ind2[temp2-1], pos_ind2[temp1-1]
-    print("############3")
-    print("ind1 = ", ind1)
-    print("ind2 = ", ind2)
     return ind1, ind2
 
 
