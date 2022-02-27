@@ -36,9 +36,9 @@ def create_route_from_ind(individual, data):
         demand = data[F'C_{customer_id}'][DEMAND]
         updated_vehicle_load = vehicle_load + demand
         service_time = data[F'C_{customer_id}'][SERVICE_TIME]
-        return_time = data[DISTANCE_MATRIX][customer_id][0] * get_travel_time(updated_vehicle_load)
+        return_time = data[DISTANCE_MATRIX][customer_id][0] * ((math.e)**(updated_vehicle_load/30))*1/4
         #    ((1 - vehicle_load/vehicle_capacity)*0.7 + 0.2)
-        travel_time = data[DISTANCE_MATRIX][previous_cust_id][customer_id] * get_travel_time(updated_vehicle_load)
+        travel_time = data[DISTANCE_MATRIX][previous_cust_id][customer_id] * ((math.e)**(updated_vehicle_load/30))*1/4
         #    ((1 - vehicle_load/vehicle_capacity)*0.7 + 0.2)
         provisional_time = time_elapsed + travel_time + service_time + return_time
         return_due = min(return_due, data[F'C_{customer_id}'][DUE_TIME])
@@ -56,7 +56,7 @@ def create_route_from_ind(individual, data):
             # Initialize a new sub-route and add to it
             sub_route = [customer_id]
             vehicle_load = demand
-            travel_time = data[DISTANCE_MATRIX][0][customer_id] * get_travel_time(updated_vehicle_load)
+            travel_time = data[DISTANCE_MATRIX][0][customer_id] *  ((math.e)**(updated_vehicle_load/30))*1/4
             
             # time_elapsed = travel_time
             time_elapsed = travel_time + service_time
@@ -106,7 +106,7 @@ def calculate_fitness(individual, data):
 
                 # Calculate section distance
                 distance = data[DISTANCE_MATRIX][previous_cust_id][cust_id]
-                distance_time = distance * get_travel_time(sum_demand)
+                distance_time = distance *  ((math.e)**(sum_demand/30))*1/4
                 
                 # Update sub-route distance
                 sub_route_distance = sub_route_distance + distance_time
@@ -179,7 +179,9 @@ def crossover_pmx(ind1, ind2):
                                     1] = pos_ind1[temp2-1], pos_ind1[temp1-1]
         pos_ind2[temp1-1], pos_ind2[temp2 -
                                     1] = pos_ind2[temp2-1], pos_ind2[temp1-1]
-
+    print("############3")
+    print("ind1 = ", ind1)
+    print("ind2 = ", ind2)
     return ind1, ind2
 
 
@@ -276,9 +278,9 @@ def update_particle(part, best, phi1, phi2):
 
     # The probability density function of the uniform distribution : phân phối đều 
     # tạo u1 u2 một cách ngẫu nhiên theo phân bố đều 
-    u1 = (random.uniform(0, phi1) for _ in range(len(part)))
-    u2 = (random.uniform(0, phi2) for _ in range(len(part)))
-    # the particle's best position
+    u1 = phi1/2.0
+    u2 = phi2/2.0   
+    # the particle's bestposition
     # print("particle best", part.best)
 
     v_u1 = map(operator.mul, u1, map(operator.sub, part.best, part))
