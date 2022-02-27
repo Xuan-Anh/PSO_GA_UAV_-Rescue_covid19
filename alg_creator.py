@@ -90,11 +90,7 @@ def print_route(route):
         print(f' # Route {route_num} # {single_route}')
 
 
-# runs the pso and prints the solution
 # https://deap.readthedocs.io/en/master/examples/pso_basic.html
-# Once the operators are registered in the toolbox, we can fire up the algorithm by firstly creating a new population,
-# and then apply the original PSO algorithm.
-# The variable best contains the best particle ever found (it is known as gbest in the original algorithm).
 def run_pso(instance_name, particle_size, pop_size, max_iteration,
             cognitive_coef, social_coef, s_limit=3, plot=False, save=False, logs=False):
 
@@ -195,7 +191,6 @@ def run_pso(instance_name, particle_size, pop_size, max_iteration,
 
 
 
-# runs ga and prints the solution
 # https://deap.readthedocs.io/en/master/examples/ga_onemax.html
 def run_ga(instance_name, individual_size, pop_size, cx_pb, mut_pb, n_gen, plot=False, save=False, logs=False):
 
