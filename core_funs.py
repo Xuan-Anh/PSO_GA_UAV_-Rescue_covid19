@@ -13,14 +13,19 @@ def get_travel_time(w):
     g = 9.8
     Wd = 60
     v0 = 200
-    P = 2200
+    P = 2000
     ts = np.sin(np.arccos(g*(Wd + w)/P))
     # print(ts)
     ms = np.sin(np.arccos(g*w/P))
     # print(ms)
-    travel_time  = ms/ts*v0 - v0 
-    return travel_time*0.1
+    travel_time  = (ms/ts*v0 - v0 )*0.025 
+    # print("Travel time: ", travel_time)
+    return travel_time
 
+# def get_travel_time_old(w):
+#     travel_time = ((math.e)**(w/30))*1/4
+#     print("Travel time: ", travel_time)
+#     return travel_time
 
 
 def create_route_from_ind(individual, data):
@@ -52,9 +57,9 @@ def create_route_from_ind(individual, data):
             vehicle_load = updated_vehicle_load
             time_elapsed = provisional_time - return_time
         else:
-            # Save current sub-route
+            # Lưu lại subroute hiện tại
             route.append(sub_route)
-            # Initialize a new sub-route and add to it
+            # Khởi tạo subroute mới
             sub_route = [customer_id]
             vehicle_load = demand
             travel_time = data[DISTANCE_MATRIX][0][customer_id] *  get_travel_time(vehicle_load)
@@ -64,7 +69,7 @@ def create_route_from_ind(individual, data):
         # Update last customer ID
         previous_cust_id = customer_id
     if sub_route:
-        # Save current sub-route before return if not empty
+        # Lưu lại nếu subroute không rỗng
         route.append(sub_route)
     return route
 
@@ -72,7 +77,7 @@ def create_route_from_ind(individual, data):
 def calculate_fitness(individual, data):
 
     transport_cost = 8.0  # chi phí gửi drone đến unit đầu tiên
-    vehicle_setup_cost = 50.0  # chi phí thêm 1 drone
+    vehicle_setup_cost = 300.0  # chi phí thêm 1 drone
     wait_penalty = 0.5  # phạt đến quá sớm
     delay_penalty = 3.0  # phạt đến quá chậm
 
@@ -268,8 +273,8 @@ def update_particle(part, best, phi1, phi2):
 
     # The probability density function of the uniform distribution : phân phối đều 
     # tạo u1 u2 một cách ngẫu nhiên theo phân bố đều 
-    u1 = phi1/2.0
-    u2 = phi2/2.0   
+    u1 = (random.uniform(0, phi1) for _ in range(len(part)))
+    u2 = (random.uniform(0, phi2) for _ in range(len(part)))  
     # the particle's bestposition
     # print("particle best", part.best)
 
@@ -288,7 +293,7 @@ def update_particle(part, best, phi1, phi2):
             part.speed[i] = math.copysign(part.smax, speed)
 
     new_part = list(map(operator.add, part, part.speed))
-    print("new_part = ", new_part)
+    # print("new_part = ", new_part)
     part[:] = validate_particle(new_part)
     # print("XA_particle: ", part)
     
