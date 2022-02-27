@@ -19,7 +19,7 @@ def get_travel_time(w):
     ms = np.sin(np.arccos(g*w/P))
     # print(ms)
     travel_time  = ms/ts*v0 - v0 
-    return travel_time
+    return travel_time*0.1
 
 
 
