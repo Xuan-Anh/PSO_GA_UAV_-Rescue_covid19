@@ -183,6 +183,8 @@ def run_pso(instance_name, particle_size, pop_size, max_iteration,
     print(f'Total cost: { round(calculate_fitness(best_ind, instance)[1],2) }')
     print(f'Found in (iteration): { iter_num }')
     print(f'Execution time (s): { round(end - start,2) }')
+    print(f'Routes: {len(route)}')
+
     # print(f'{round(best_ind.fitness.values[0], 2)} & {round(calculate_fitness(best_ind, instance)[1],2)} & {iter_num} & {round(end - start, 2)}')
 
     if plot:
