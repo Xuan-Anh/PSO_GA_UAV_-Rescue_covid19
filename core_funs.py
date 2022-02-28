@@ -145,7 +145,7 @@ def calculate_fitness(individual, data):
 
         # fitness = - math.log(1.0 / total_cost)
         fitness = 100000.0 / total_cost
-
+         
     return fitness, total_cost
 
 
