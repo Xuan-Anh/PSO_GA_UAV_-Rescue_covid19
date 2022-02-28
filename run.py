@@ -9,7 +9,7 @@ if __name__ == '__main__':
 
     customers_count = 30          
 
-    max_generations = 1000
+    max_generations = 10
 
     particles_pop_size = customers_count # particles_pop_size = customers_size
     cognitive_acceleration = 2
